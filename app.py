@@ -28,6 +28,8 @@ from langchain_chroma import Chroma
 from langchain_community.embeddings import DashScopeEmbeddings
 from langchain_community.chat_models import ChatTongyi
 
+from flask_cors import CORS
+
 # ipfs功能调用
 from upload_ipfs import upload_text_and_get_preview_url
 
@@ -37,6 +39,11 @@ app.secret_key = 'your-secret-key-here'
 
 # 初始化SocketIO，启用CORS支持
 socketio = SocketIO(app, cors_allowed_origins="*")
+
+CORS(
+    app,
+    resources={r"/connect_wallet": {"origins": "*"}},
+)
 
 # ==================== 文件路径配置 ====================
 UPLOAD_FOLDER = 'USER_DATA'
@@ -206,6 +213,12 @@ def get_user(user_id):
     conn.close()
     return user
 
+def load_users():
+    if os.path.exists(USER_DB_FILE):
+        with open(USER_DB_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return {}
+
 # 替代原来的save_users函数
 def update_user(user_id, **kwargs):
     conn = get_db_connection()
@@ -219,7 +232,13 @@ def update_user(user_id, **kwargs):
     conn.commit()
     conn.close()
 
+def save_users(users):
+    with open(USER_DB_FILE, 'w', encoding='utf-8') as f:
+        json.dump(users, f, ensure_ascii=False, indent=2)
+    # print("save_user")
+
 def add_user(user_id, password_hash, coin_balance=1.0, total_earned=0.0, total_spent=0.0, registration_time=None, wallet_account=None):
+    # print("add_add_user")
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -233,6 +252,22 @@ def add_user(user_id, password_hash, coin_balance=1.0, total_earned=0.0, total_s
     
     conn.commit()
     conn.close()
+
+def add_user_list(user_id):
+    # print("add_user")
+    users = load_users()
+    users[user_id] = {
+        'password_hash': hash_password(123456),
+        'coin_balance': 1.0,
+        'total_earned': 0.0,  # 🎯 确保初始化为0
+        'total_spent': 0.0,   # 🎯 确保初始化为0
+        'registration_time': datetime.now().isoformat(),
+        'uploaded_files': [],
+        'referenced_files': []  # 🎯 确保这个字段存在
+    }
+    # print("load_user ")
+    save_users(users)
+    
 
 # 上传文件相关函数
 def add_uploaded_file(user_id, file_id):
@@ -303,19 +338,19 @@ def save_transactions(transactions):
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-def register_user(user_id, password):
-    conn = get_db_connection()
+# def register_user(user_id, password):
+#     conn = get_db_connection()
     
-    # 检查用户ID是否已存在
-    existing_user = conn.execute('SELECT * FROM users WHERE user_id = ?', (user_id,)).fetchone()
-    if existing_user:
-        conn.close()
-        return False, "用户ID已存在"
+#     # 检查用户ID是否已存在
+#     existing_user = conn.execute('SELECT * FROM users WHERE user_id = ?', (user_id,)).fetchone()
+#     if existing_user:
+#         conn.close()
+#         return False, "用户ID已存在"
     
-    # 创建新用户
-    add_user(user_id, hash_password(password))
-    conn.close()
-    return True, "注册成功"
+#     # 创建新用户
+#     add_user(user_id, hash_password(password))
+#     conn.close()
+#     return True, "注册成功"
 
 def authenticate_user(user_id, password):
     conn = get_db_connection()
@@ -366,12 +401,16 @@ def get_user_stats(user_id):
         'uploaded_files_count': uploaded_files_count
     }
 
-@app.route('/connect_wallet', methods=['POST'])
+@app.route('/connect_wallet', methods=['POST','OPTIONS'])
 def connect_wallet():
     """处理钱包连接请求"""
-    data = request.get_json()
+    print("开始连接钱包")
+    if request.method == 'OPTIONS':
+        return jsonify({'success': True}), 200
+    # data = request.get_json()
+    data = request.get_json(silent=True) or {}
     wallet_address = data.get('wallet_address')
-    
+    print(wallet_address)
     if not wallet_address:
         return jsonify({'success': False, 'message': '钱包地址不能为空'})
     
@@ -389,8 +428,30 @@ def connect_wallet():
             'wallet_account': existing_user['wallet_account']
         })
     
+
+    #检查用户是否在列表
+    users = load_users()
+    user_id = wallet_address
+    password = '123456'
+    
+    if user_id in users:
+        print("钱包用户已在列表")
+    else:
+        users[user_id] = {
+        'password_hash': hash_password(password),
+        'coin_balance': 1.0,
+        'total_earned': 0.0,  #初始化为0
+        'total_spent': 0.0,   # 初始化为0
+        'registration_time': datetime.now().isoformat(),
+        'uploaded_files': [],
+        'referenced_files': []  #这个字段存在
+        } 
+        save_users(users)
+
+
     # 钱包地址不存在，创建新用户
     try:
+        print("连接用户列表")
         # 使用钱包地址作为 user_id，默认密码 123456
         user_id = wallet_address
         password = '123456'
@@ -455,6 +516,9 @@ def calculate_user_earnings(user_id):
     # 更新用户数据
     update_user(user_id, total_earned=total_earned, total_spent=total_spent, coin_balance=calculated_balance)
     conn.close()
+
+
+
     
     print(f"💰 用户 {user_id} 收益统计: 总收益={total_earned:.6f}, 总支出={total_spent:.6f}, 引用次数={reference_count}")
     
@@ -652,9 +716,9 @@ def save_shared_file(user_id, filename, content, authorize_rag=True):
 
 def add_file_to_vector_store(filepath, file_id, user_id, filename,ipfs_url):
     global vector_store
-    
+
     try:
-        init_vector_store(filepath,ipfs_url)
+        init_vector_store(filepath,None,None,None,ipfs_url)
         print(f"成功添加文件到知识库: {filename}")
     except Exception as e:
         print(f"添加文件到向量库失败: {e}")
@@ -1477,20 +1541,20 @@ def login():
     
     return render_template('login.html')
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        user_id = request.form.get('user_id', '').strip()
-        password = request.form.get('password', '').strip()
+# @app.route('/register', methods=['GET', 'POST'])
+# def register():
+#     if request.method == 'POST':
+#         user_id = request.form.get('user_id', '').strip()
+#         password = request.form.get('password', '').strip()
         
-        success, message = register_user(user_id, password)
-        if success:
-            session['user_id'] = user_id
-            return jsonify({'success': True, 'message': message})
-        else:
-            return jsonify({'success': False, 'message': message})
+#         success, message = register_user(user_id, password)
+#         if success:
+#             session['user_id'] = user_id
+#             return jsonify({'success': True, 'message': message})
+#         else:
+#             return jsonify({'success': False, 'message': message})
     
-    return render_template('register.html')
+#     return render_template('register.html')
 
 @app.route('/logout')
 def logout():
@@ -1517,14 +1581,30 @@ def dashboard():
 
 @app.route('/share', methods=['POST'])
 def share_file():
+    # print(session)
+    # print('user_id')
+    users = load_users()
+
+    wallet_address = request.form.get('wallet_address', '').strip()
+    print("wallet_address:", wallet_address)
+    # data = request.get_json(silent=True) or {}
+    # wallet_address = data.get('wallet_address')
+    print("wallet_address:", wallet_address)
+    # wallet_address = request.form.get('wallet_address', '').strip()
+    # print(wallet_address)
+    if wallet_address not in users:
+        return jsonify({'success': False, 'message': '钱包未注册，请先连接钱包'})
+    
+    user_id = wallet_address
+
     # if 'user_id' not in session:
-    #     return jsonify({'success': False, 'message': '请先登录'})
+    #     return jsonify({'success': False, 'message': '请先连接钱包'})
     # 为了测试，允许未登录用户使用默认测试账号
-    if 'user_id' not in session:
-        # 使用默认测试账号
-        user_id = 'test0'
-    else:
-        user_id = session['user_id']
+    # if 'user_id' not in session:
+    #     # 使用默认测试账号
+    #     user_id = 'test0'
+    # else:
+    #     user_id = session['user_id']
     
     filename = request.form.get('filename', '').strip()
     content = request.form.get('content', '').strip()
@@ -1567,12 +1647,27 @@ def get_file_content(file_id):
 
 @app.route('/ask')
 def ask_stream():
-    # 为了测试，允许未登录用户使用默认测试账号
-    if 'user_id' not in session:
-        # 使用默认测试账号
-        user_id = 'test0'
-    else:
-        user_id = session['user_id']
+    # # 为了测试，允许未登录用户使用默认测试账号
+    # if 'user_id' not in session:
+    #     # 使用默认测试账号
+    #     user_id = 'test0'
+    # else:
+    #     user_id = session['user_id']
+    users = load_users()
+    wallet_address = request.args.get('wallet_address', '').strip()
+    print("wallet_address:", wallet_address)
+    # data = request.get_json(silent=True) or {}
+    # wallet_address = data.get('wallet_address')
+    print("wallet_address:", wallet_address)
+    # wallet_address = request.form.get('wallet_address', '').strip()
+    # print(wallet_address)
+    if wallet_address not in users:
+        return jsonify({'success': False, 'message': '钱包未注册，请先连接钱包'})
+    
+    user_id = wallet_address
+
+
+
     question = request.args.get('q', '').strip()
     
     print(f"用户 {user_id} 提问: {question}")
