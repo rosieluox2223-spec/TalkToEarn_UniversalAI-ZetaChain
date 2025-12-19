@@ -20,6 +20,7 @@ const Index = () => {
       await switchToChain('zetachain');
       // 等待网络切换完成
       await new Promise(resolve => setTimeout(resolve, 1000));
+
       // 刷新页面以更新 provider
       window.location.reload();
     } catch (error: any) {
@@ -74,6 +75,38 @@ const Index = () => {
 
     updateCurrentChain();
   }, [provider, isConnected]);
+
+  useEffect(() => {
+  console.log("🔥 wallet effect fired", { isConnected, account });
+  if (!isConnected || !account) return;
+
+  const connectBackendWallet = async () => {
+    try {
+      const res = await fetch("http://localhost:5001/connect_wallet", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          wallet_address: account,
+        }),
+      });
+
+      const data = await res.json();
+      console.log("connect_wallet 返回：", data);
+
+      if (!data.success) {
+        console.error("后端连接失败：", data.message);
+      }
+    } catch (err) {
+      console.error("调用 connect_wallet 失败：", err);
+    }
+  };
+
+  connectBackendWallet();
+}, [isConnected, account]);
+
+
   const features = [
     {
       icon: Database,
