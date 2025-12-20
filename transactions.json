@@ -273,5 +273,71 @@
     "file_id": "20251220024212_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
     "question": "什么是睡眠",
     "timestamp": "2025-12-20T13:50:40.636167"
+  },
+  {
+    "id": "3251322d-ba98-4962-a0d0-c1100b951c1b",
+    "type": "spend",
+    "from_user": "0xeb2eb574be8001ef7ff3c60bd56caac4ed58fab2",
+    "to_user": "system",
+    "amount": 1e-06,
+    "file_owner": null,
+    "file_id": null,
+    "question": "为什么需要爱？",
+    "timestamp": "2025-12-20T18:14:41.676757"
+  },
+  {
+    "id": "a9d2429f-62e9-4767-8e1e-b6c8932b40af",
+    "type": "spend",
+    "from_user": "0xeb2eb574be8001ef7ff3c60bd56caac4ed58fab2",
+    "to_user": "system",
+    "amount": 1e-06,
+    "file_owner": null,
+    "file_id": null,
+    "question": "为什么需要爱？",
+    "timestamp": "2025-12-20T18:26:42.536848"
+  },
+  {
+    "id": "3796a7b5-6a7c-44f3-9bb0-23bb5343e074",
+    "type": "spend",
+    "from_user": "0xeb2eb574be8001ef7ff3c60bd56caac4ed58fab2",
+    "to_user": "system",
+    "amount": 1e-06,
+    "file_owner": null,
+    "file_id": null,
+    "question": "为什么需要爱？",
+    "timestamp": "2025-12-20T18:38:08.811239"
+  },
+  {
+    "id": "0b3ade3f-8338-4388-8e36-8f42bbb1a998",
+    "type": "spend",
+    "from_user": "0xeb2eb574be8001ef7ff3c60bd56caac4ed58fab2",
+    "to_user": "system",
+    "amount": 1e-06,
+    "file_owner": null,
+    "file_id": null,
+    "question": "为什么需要爱？",
+    "timestamp": "2025-12-20T18:40:17.491245"
+  },
+  {
+    "id": "6d1904b4-3b88-43cc-ab5d-5713e119b025",
+    "type": "reward",
+    "from_user": null,
+    "to_user": "0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+    "amount": 1e-06,
+    "file_owner": "0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+    "file_id": "20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+    "question": "为什么需要爱？",
+    "timestamp": "2025-12-20T18:40:20.572725"
+  },
+  {
+    "id": "26535550-0752-47e7-beb6-b4298384e354",
+    "type": "reference",
+    "from_user": "0xeb2eb574be8001ef7ff3c60bd56caac4ed58fab2",
+    "to_user": "0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+    "amount": 0.0,
+    "file_owner": "0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+    "file_id": "20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+    "question": "为什么需要爱？",
+    "timestamp": "2025-12-20T18:40:20.572759"
   }
 ]

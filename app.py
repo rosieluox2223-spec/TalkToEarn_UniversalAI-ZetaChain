@@ -135,6 +135,35 @@ def init_db():
         FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
     )
     ''')
+
+ # 创建文章表
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS files (
+        id TEXT PRIMARY KEY,
+        filename TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        content TEXT,
+        content_preview TEXT,
+        upload_time TEXT,
+        authorize_rag INTEGER,
+        reference_count INTEGER,
+        total_reward REAL,
+        file_path TEXT,
+        ipfs_url TEXT, 
+        total_staked REAL DEFAULT 0.0)
+    ''')
+    
+    # 创建质押记录表
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS stakes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        file_id TEXT NOT NULL,
+        wallet_address TEXT NOT NULL,
+        amount REAL NOT NULL,
+        content_id TEXT NOT NULL,
+        stake_time TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+    ''')
     
     conn.commit()
     conn.close()
@@ -189,6 +218,36 @@ def migrate_from_json_to_db():
                         ref_file['similarity'],
                         ref_file['weight']
                     ))
+    
+    # 检查files表是否为空，迁移文件数据
+    cursor.execute('SELECT COUNT(*) FROM files')
+    if cursor.fetchone()[0] == 0:
+        # 从JSON文件加载文件数据
+        if os.path.exists(FILES_DB_FILE):
+            with open(FILES_DB_FILE, 'r', encoding='utf-8') as f:
+                files_data = json.load(f)
+            
+            # 迁移文件数据
+            for file_id, file_info in files_data.items():
+                cursor.execute('''
+                INSERT INTO files (id, filename, user_id, content, content_preview, upload_time, 
+                                  authorize_rag, reference_count, total_reward, file_path, ipfs_url, total_staked)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    file_id,
+                    file_info['filename'],
+                    file_info['user_id'],
+                    file_info['content'],
+                    file_info['content_preview'],
+                    file_info['upload_time'],
+                    file_info.get('authorize_rag', 1),
+                    file_info.get('reference_count', 0),
+                    file_info.get('total_reward', 0.0),
+                    file_info.get('file_path', ''),
+                    file_info.get('ipfs_url', ''),
+                    file_info.get('total_staked', 0.0)
+                ))
+                print(f"✅ 已迁移文件: {file_id} - {file_info['filename']}")
     
     conn.commit()
     conn.close()
@@ -908,6 +967,9 @@ def distribute_rewards(user_id, question, relevant_docs, total_cost):
             # 尝试找到匹配的文件
             file_info = None
             if file_id and file_id in files:
+
+                print('---------',file_id)
+
                 file_info = files[file_id]
             else:
                 # 如果file_id不匹配，尝试通过文件名或内容匹配
@@ -1744,8 +1806,6 @@ def ask_stream():
     wallet_address = request.args.get('wallet_address', '').strip()
     print("wallet_address:", wallet_address)
 
-
-
     if wallet_address not in users:
         return jsonify({'success': False, 'message': '钱包未注册，请先连接钱包'})
     
@@ -2011,13 +2071,13 @@ def ask_stream():
     return Response(generate_response(), mimetype='text/event-stream')
 
 
-# @app.route('/community')
-# def community():
-#     if 'user_id' not in session:
-#         return redirect('/login')
+@app.route('/community')
+def community():
+    if 'user_id' not in session:
+        return redirect('/login')
     
-#     files = search_files()
-#     return render_template('community.html', files=files, session=session)
+    files = search_files()
+    return render_template('community.html', files=files, session=session)
 
 @app.route('/file_detail/<file_id>')
 def file_detail(file_id):
@@ -2098,7 +2158,6 @@ def reload_vector_store():
         user_id = 'test0'
     else:
         user_id = session['user_id']
-
     
     try:
         global vector_store
@@ -2191,61 +2250,75 @@ def health_check():
     
     return jsonify(status)
 
-# @app.route('/files')
-# def list_files():
-#     if 'user_id' not in session:
-#         return jsonify({'success': False, 'message': '请先登录'})
+@app.route('/files')
+@app.route('/api/files')
+def list_files():
+    # 支持两种认证方式：session和wallet_address参数
+    user_id = None
     
-#     keyword = request.args.get('keyword', '').strip()
-#     file_id = request.args.get('file_id', '').strip()
+    # 检查session
+    if 'user_id' in session:
+        user_id = session['user_id']
     
-#     # 🎯 优化搜索逻辑
-#     files = search_files(file_id=file_id if file_id else None, keyword=keyword)
+    # 如果session中没有用户ID，检查wallet_address参数
+    if not user_id:
+        wallet_address = request.args.get('wallet_address', '').strip()
+        if wallet_address:
+            user_id = wallet_address
     
-#     print(f"🔍 搜索请求 - 关键词: '{keyword}', 文件ID: '{file_id}', 结果数量: {len(files)}")
+    if not user_id:
+        return jsonify({'success': False, 'message': '请先登录'})
     
-#     return jsonify({
-#         'success': True,
-#         'files': files,
-#         'count': len(files)
-#     })
+    keyword = request.args.get('keyword', '').strip()
+    file_id = request.args.get('file_id', '').strip()
+    
+    # 🎯 优化搜索逻辑
+    files = search_files(file_id=file_id if file_id else None, keyword=keyword)
+    
+    print(f"🔍 搜索请求 - 关键词: '{keyword}', 文件ID: '{file_id}', 结果数量: {len(files)}")
+    
+    return jsonify({
+        'success': True,
+        'files': files,
+        'count': len(files)
+    })
 
-# def search_files(file_id=None, user_id=None, keyword=None):
-#     """优化文件搜索功能"""
-#     files = load_files()
-#     results = []
+def search_files(file_id=None, user_id=None, keyword=None):
+    """优化文件搜索功能"""
+    files = load_files()
+    results = []
     
-#     print(f"🔍 搜索文件 - file_id: {file_id}, user_id: {user_id}, keyword: {keyword}")
+    print(f"🔍 搜索文件 - file_id: {file_id}, user_id: {user_id}, keyword: {keyword}")
     
-#     for fid, file_info in files.items():
-#         match = True
+    for fid, file_info in files.items():
+        match = True
         
-#         if file_id and fid != file_id:
-#             match = False
-#         if user_id and file_info['user_id'] != user_id:
-#             match = False
-#         if keyword:
-#             keyword_lower = keyword.lower()
-#             # 🎯 优化：在文件名和内容中搜索，提高搜索准确性
-#             filename_match = keyword_lower in file_info['filename'].lower()
-#             content_match = keyword_lower in file_info['content'].lower()
-#             file_id_match = keyword_lower in fid.lower()
-#             user_id_match = keyword_lower in file_info['user_id'].lower()
+        if file_id and fid != file_id:
+            match = False
+        if user_id and file_info['user_id'] != user_id:
+            match = False
+        if keyword:
+            keyword_lower = keyword.lower()
+            # 🎯 优化：在文件名和内容中搜索，提高搜索准确性
+            filename_match = keyword_lower in file_info['filename'].lower()
+            content_match = keyword_lower in file_info['content'].lower()
+            file_id_match = keyword_lower in fid.lower()
+            user_id_match = keyword_lower in file_info['user_id'].lower()
             
-#             if not (filename_match or content_match or file_id_match or user_id_match):
-#                 match = False
+            if not (filename_match or content_match or file_id_match or user_id_match):
+                match = False
                 
-#         if match:
-#             results.append({
-#                 'file_id': fid,
-#                 **file_info
-#             })
+        if match:
+            results.append({
+                'file_id': fid,
+                **file_info
+            })
     
-#     # 按上传时间倒序排列
-#     sorted_results = sorted(results, key=lambda x: x['upload_time'], reverse=True)
+    # 按上传时间倒序排列
+    sorted_results = sorted(results, key=lambda x: x['upload_time'], reverse=True)
     
-#     print(f"✅ 搜索完成，找到 {len(sorted_results)} 个文件")
-#     return sorted_results
+    print(f"✅ 搜索完成，找到 {len(sorted_results)} 个文件")
+    return sorted_results
 
 @app.route('/community/files', methods=['GET'])
 def get_community_files():
@@ -2790,8 +2863,128 @@ def get_user_stats_api():
     })
 
 
+@app.route('/stake', methods=['POST'])
+def handle_stake():
+    """处理质押信息的写入"""
+    try:
+        # 解析请求体
+        data = request.get_json()
+        
+        # 验证必要字段
+        required_fields = ['file_id', 'wallet_address', 'amount', 'content_id']
+        for field in required_fields:
+            if field not in data or not data[field]:
+                return jsonify({'success': False, 'message': f'{field}字段不能为空'})
+        
+        file_id = data['file_id']
+        wallet_address = data['wallet_address']
+        amount = float(data['amount'])
+        content_id = data['content_id']
+        
+        # 写入数据库
+        conn = get_db_connection()
+        conn.execute('''
+        INSERT INTO stakes (file_id, wallet_address, amount, content_id)
+        VALUES (?, ?, ?, ?)
+        ''', (file_id, wallet_address, amount, content_id))
+        conn.commit()
+        conn.close()
+        
+        # 更新数据库中的files表的total_staked字段
+        conn = get_db_connection()
+        conn.execute('''
+        UPDATE files 
+        SET total_staked = total_staked + ? 
+        WHERE id = ?
+        ''', (amount, file_id))
+        conn.commit()
+        conn.close()
+        
+        # 同时更新JSON文件以保持兼容性
+        files = load_files()
+        if file_id in files:
+            files[file_id]['total_staked'] = files[file_id].get('total_staked', 0) + amount
+            save_files(files)
+        
+        return jsonify({
+            'success': True,
+            'message': '质押信息已成功写入数据库'
+        })
+    
+    except json.JSONDecodeError:
+        return jsonify({'success': False, 'message': '请求体不是有效的JSON格式'})
+    except ValueError:
+        return jsonify({'success': False, 'message': 'amount字段必须是有效的数字'})
+    except Exception as e:
+        print(f"处理质押请求时出错: {str(e)}")
+        return jsonify({'success': False, 'message': f'服务器错误: {str(e)}'})
 
 
+@app.route('/stake', methods=['GET'])
+def get_stakes():
+    """获取质押记录"""
+    try:
+        # 获取查询参数
+        wallet_address = request.args.get('wallet_address', '').strip()
+        file_id = request.args.get('file_id', '').strip()
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 构建查询语句，关联files表获取文件名
+        query = """
+            SELECT 
+                t2.filename, 
+                t1.amount, 
+                t1.stake_time, 
+                t1.id, 
+                t1.file_id, 
+                t1.wallet_address, 
+                t1.content_id
+            FROM stakes t1 
+            LEFT JOIN files t2 ON t1.file_id = t2.id 
+            WHERE 1=1
+        """
+        params = []
+        
+        if wallet_address:
+            query += " AND t1.wallet_address = ?"
+            params.append(wallet_address)               
+        
+        # 按时间倒序排列
+        query += " ORDER BY t1.stake_time DESC"
+
+        print(query, params)
+        
+        cursor.execute(query, params)
+        stakes = cursor.fetchall()
+        conn.close()
+        
+        for stake in stakes:
+            print(stake)
+
+        # 转换为字典列表
+        stake_list = []
+        for stake in stakes:
+            stake_list.append({
+                'id': stake['id'],
+                'file_id': stake['file_id'],
+                'wallet_address': stake['wallet_address'],
+                'amount': stake['amount'],
+                'content_id': stake['content_id'],
+                'stake_time': stake['stake_time'],
+                'filename': stake['filename']  # 新增文件名字段
+            })
+        
+        return jsonify({
+            'success': True,
+            'stakes': stake_list,
+            'count': len(stake_list)
+        })
+    
+    except Exception as e:
+        print(f"获取质押记录时出错: {str(e)}")
+        return jsonify({'success': False, 'message': f'服务器错误: {str(e)}'})
 
 
 

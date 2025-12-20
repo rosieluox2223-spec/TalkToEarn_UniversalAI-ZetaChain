@@ -9,6 +9,7 @@ import Community from "./pages/Community";
 import FileDetail from "./pages/FileDetail"; 
 import Chat from "./pages/Chat";
 import Dashboard from "./pages/Dashboard";
+import Staking from "./pages/Staking";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,10 +23,10 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/upload" element={<Upload />} />
-
           <Route path="/community" element={<Community />} />
           <Route path="/file_detail/:fileId" element={<FileDetail />} />
           <Route path="/chat" element={<Chat />} />
+          <Route path="/staking" element={<Staking />} />
           <Route path="/dashboard" element={<Dashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

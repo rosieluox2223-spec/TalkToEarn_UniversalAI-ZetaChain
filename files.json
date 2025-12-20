@@ -6,10 +6,11 @@
     "content_preview": "爱是一个无法被单一定义包容的词汇，它更像一场多棱的光，在不同关系中折射出不同的色彩。\r\n\r\n在亲密关系里，爱是主动选择的牵绊——它始于悸动，却延续于日复一日的选择。当最初的光晕褪去，我们仍愿意理解彼此的孤独，在对方的局限里看见真实，并依然选择靠近。这种爱不是占有，而是两个完整灵魂的相互映照。\r\n\r\n推及更广，爱是一种向世界舒展的能力。是对清晨路边野花的留心，是对陌生人痛苦的共情，是明知世界不完美仍...",
     "upload_time": "2025-12-20T02:41:45.232422",
     "authorize_rag": true,
-    "reference_count": 6,
-    "total_reward": 5.999999999999999e-06,
+    "reference_count": 7,
+    "total_reward": 6.999999999999999e-06,
     "file_path": "SHARED_CONTENT\\20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d.txt",
-    "ipfs_url": "https://gateway.pinata.cloud/ipfs/QmQDJjT6Rs1DVDcNAfCGN53ao6NxfU2MBeYQtFckiAzFLi"
+    "ipfs_url": "https://gateway.pinata.cloud/ipfs/QmQDJjT6Rs1DVDcNAfCGN53ao6NxfU2MBeYQtFckiAzFLi",
+    "total_staked": 0.006
   },
   "20251220024212_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d": {
     "filename": "exercise",
@@ -21,7 +22,8 @@
     "reference_count": 1,
     "total_reward": 2.8441151709432187e-07,
     "file_path": "SHARED_CONTENT\\20251220024212_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d.txt",
-    "ipfs_url": "https://gateway.pinata.cloud/ipfs/QmbLLNiBRHymHapeRqUHY2jy6PHvhxVW47kBme2RZTYKyH"
+    "ipfs_url": "https://gateway.pinata.cloud/ipfs/QmbLLNiBRHymHapeRqUHY2jy6PHvhxVW47kBme2RZTYKyH",
+    "total_staked": 0.003
   },
   "20251220134820_0x6d94e87fa68cc9b474d3e29141bb11930b5056b1": {
     "filename": "sleep",

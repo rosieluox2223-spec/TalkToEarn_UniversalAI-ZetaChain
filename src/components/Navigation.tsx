@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Wallet, Upload, MessageSquare, LayoutDashboard, CheckCircle, Copy, Users } from "lucide-react";
+import { Wallet, Upload, MessageSquare, LayoutDashboard, CheckCircle, Copy, Users, ArrowUpRight } from "lucide-react";
 import { useWeb3 } from "@/hooks/useWeb3";
 import { switchToChain, CHAIN_CONFIGS } from "@/lib/chains";
 import { getZetaBalance } from "@/lib/zetachain";
@@ -130,6 +130,7 @@ export const Navigation = () => {
     { path: "/upload", label: "上传内容", icon: Upload },
     { path: "/community", label: "内容分享", icon: Users },
     { path: "/chat", label: "AI 对话", icon: MessageSquare },
+    { path: "/staking", label: "质押管理", icon: ArrowUpRight },
     { path: "/dashboard", label: "个人仪表盘", icon: LayoutDashboard },
   ];
 
@@ -167,7 +168,7 @@ export const Navigation = () => {
               {/* 当前网络显示 */}
               <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg">
                 <span className="text-sm font-medium text-blue-900">
-                  网络: {currentNetwork || '未知网络'}
+                  {currentNetwork || '未知网络'}
                 </span>
               </div>
               
@@ -183,7 +184,7 @@ export const Navigation = () => {
                 <DropdownMenuTrigger asChild>
                   <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-lg cursor-pointer hover:bg-green-100 transition-colors">
                     <CheckCircle className="w-4 h-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-900">已连接</span>
+                    <span className="text-sm font-medium text-green-900"></span>
                     <Wallet className="w-4 h-4 text-gray-500" />
                     <span className="text-sm font-mono text-gray-700">
                       {account.slice(0, 6)}...{account.slice(-4)}

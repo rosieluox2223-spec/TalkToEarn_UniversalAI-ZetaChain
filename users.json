@@ -33,6 +33,14 @@
         "timestamp": "2025-12-20T13:50:40.638101",
         "similarity": 0.27075135564288033,
         "weight": 0.2844115170943219
+      },
+      {
+        "file_id": "20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+        "question": "为什么需要爱？",
+        "reward": 1e-06,
+        "timestamp": "2025-12-20T18:40:20.572952",
+        "similarity": 0.2142868945931927,
+        "weight": 1.0
       }
     ]
   },
@@ -56,7 +64,7 @@
       }
     ]
   },
-  "0x39888ce8e6e9919cb0bab3ff51c9cb101c3fdb98": {
+  "0xeb2eb574be8001ef7ff3c60bd56caac4ed58fab2": {
     "password_hash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
     "coin_balance": 1.0,
     "total_earned": 0.0,

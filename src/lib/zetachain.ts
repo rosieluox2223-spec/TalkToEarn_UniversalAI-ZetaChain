@@ -15,7 +15,7 @@ import { Intent } from '../types/intent' // 确保路径根据你的项目结构
 // ==========================================
 
 // 你的 TalkToEarnManager 合约地址 (新)
-export const MANAGER_CONTRACT_ADDRESS = '0x6a5B86085CE2818Ae41aC0A089C83fd100a7bCB8'
+export const MANAGER_CONTRACT_ADDRESS = '0xD7BF0f6Ec8Cb9b8f334cfe012D1021d54Dc273b4'
 
 // 你的 NFT 合约地址 (新)
 export const NFT_CONTRACT_ADDRESS = '0xB7277D1C77B6239910f0F67ad72A23cB13a6Df66'
