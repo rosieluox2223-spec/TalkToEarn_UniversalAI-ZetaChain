@@ -141,7 +141,7 @@ export const Navigation = () => {
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-gradient-primary shadow-glow-primary" />
             <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              AI DataMarket
+              TalkToEarn
             </span>
           </div>
 

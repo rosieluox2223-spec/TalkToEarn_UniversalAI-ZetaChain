@@ -283,7 +283,7 @@ const Index = () => {
 
       <footer className="border-t border-border/50 py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2024 AI DataMarket. Powered by Web3 & AI Technology.</p>
+          <p>© 2025 TalkToEarn. Powered by Web3 & AI Technology.</p>
         </div>
       </footer>
     </div>
