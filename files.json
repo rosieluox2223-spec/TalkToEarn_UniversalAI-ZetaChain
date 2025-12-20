@@ -1,26 +1,38 @@
 {
-  "20251219140937_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d": {
+  "20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d": {
     "filename": "love",
     "user_id": "0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
     "content": "爱是一个无法被单一定义包容的词汇，它更像一场多棱的光，在不同关系中折射出不同的色彩。\r\n\r\n在亲密关系里，爱是主动选择的牵绊——它始于悸动，却延续于日复一日的选择。当最初的光晕褪去，我们仍愿意理解彼此的孤独，在对方的局限里看见真实，并依然选择靠近。这种爱不是占有，而是两个完整灵魂的相互映照。\r\n\r\n推及更广，爱是一种向世界舒展的能力。是对清晨路边野花的留心，是对陌生人痛苦的共情，是明知世界不完美仍愿温柔以待的坚持。它让我们突破自我的牢笼，与他者的生命建立真实的联结。\r\n\r\n最深层的爱，最终指向自由——它不是捆绑，而是在彼此的存在中找到飞翔的勇气。真爱从不需要牺牲个体的完整，恰恰相反，它呼唤我们成为更真实的自己。当我们真正去爱时，便短暂地战胜了人类最深的孤独，在浩瀚宇宙中为彼此点亮微光。",
     "content_preview": "爱是一个无法被单一定义包容的词汇，它更像一场多棱的光，在不同关系中折射出不同的色彩。\r\n\r\n在亲密关系里，爱是主动选择的牵绊——它始于悸动，却延续于日复一日的选择。当最初的光晕褪去，我们仍愿意理解彼此的孤独，在对方的局限里看见真实，并依然选择靠近。这种爱不是占有，而是两个完整灵魂的相互映照。\r\n\r\n推及更广，爱是一种向世界舒展的能力。是对清晨路边野花的留心，是对陌生人痛苦的共情，是明知世界不完美仍...",
-    "upload_time": "2025-12-19T14:10:17.725354",
+    "upload_time": "2025-12-20T02:41:45.232422",
     "authorize_rag": true,
-    "reference_count": 2,
-    "total_reward": 2e-06,
-    "file_path": "SHARED_CONTENT\\20251219140937_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d.txt",
+    "reference_count": 6,
+    "total_reward": 5.999999999999999e-06,
+    "file_path": "SHARED_CONTENT\\20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d.txt",
     "ipfs_url": "https://gateway.pinata.cloud/ipfs/QmQDJjT6Rs1DVDcNAfCGN53ao6NxfU2MBeYQtFckiAzFLi"
   },
-  "20251219141052_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d": {
+  "20251220024212_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d": {
     "filename": "exercise",
     "user_id": "0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
     "content": "锻炼能强健体魄、提升心情。它增强心肺功能，帮助控制体重，降低慢性病风险；同时释放内啡肽，缓解压力焦虑，改善睡眠质量。规律运动还能提升精力与专注力，并促进社交互动。长期坚持，身心皆受益。",
     "content_preview": "锻炼能强健体魄、提升心情。它增强心肺功能，帮助控制体重，降低慢性病风险；同时释放内啡肽，缓解压力焦虑，改善睡眠质量。规律运动还能提升精力与专注力，并促进社交互动。长期坚持，身心皆受益。",
-    "upload_time": "2025-12-19T14:10:56.861398",
+    "upload_time": "2025-12-20T02:42:15.542367",
     "authorize_rag": true,
-    "reference_count": 0,
-    "total_reward": 0.0,
-    "file_path": "SHARED_CONTENT\\20251219141052_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d.txt",
+    "reference_count": 1,
+    "total_reward": 2.8441151709432187e-07,
+    "file_path": "SHARED_CONTENT\\20251220024212_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d.txt",
     "ipfs_url": "https://gateway.pinata.cloud/ipfs/QmbLLNiBRHymHapeRqUHY2jy6PHvhxVW47kBme2RZTYKyH"
+  },
+  "20251220134820_0x6d94e87fa68cc9b474d3e29141bb11930b5056b1": {
+    "filename": "sleep",
+    "user_id": "0x6d94e87fa68cc9b474d3e29141bb11930b5056b1",
+    "content": "睡眠是大脑与身体的主动修复过程。它清除代谢废物、巩固记忆，并调节激素平衡。缺乏睡眠将导致认知下降、免疫紊乱，是维持生命不可或缺的生理周期。",
+    "content_preview": "睡眠是大脑与身体的主动修复过程。它清除代谢废物、巩固记忆，并调节激素平衡。缺乏睡眠将导致认知下降、免疫紊乱，是维持生命不可或缺的生理周期。",
+    "upload_time": "2025-12-20T13:48:24.766351",
+    "authorize_rag": true,
+    "reference_count": 1,
+    "total_reward": 7.15588482905678e-07,
+    "file_path": "SHARED_CONTENT\\20251220134820_0x6d94e87fa68cc9b474d3e29141bb11930b5056b1.txt",
+    "ipfs_url": "https://gateway.pinata.cloud/ipfs/QmNkx7dDrtPFijbrXwZrpPkdx8ahDK5FidjTqRipJsoi6b"
   }
 }
