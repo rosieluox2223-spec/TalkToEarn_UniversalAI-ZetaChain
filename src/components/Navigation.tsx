@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Wallet, Upload, MessageSquare, LayoutDashboard, CheckCircle, Copy } from "lucide-react";
+import { Wallet, Upload, MessageSquare, LayoutDashboard, CheckCircle, Copy, Users } from "lucide-react";
 import { useWeb3 } from "@/hooks/useWeb3";
 import { switchToChain, CHAIN_CONFIGS } from "@/lib/chains";
 import { getZetaBalance } from "@/lib/zetachain";
@@ -128,6 +128,7 @@ export const Navigation = () => {
   const navItems = [
     { path: "/", label: "首页", icon: LayoutDashboard },
     { path: "/upload", label: "上传内容", icon: Upload },
+    { path: "/community", label: "内容分享", icon: Users },
     { path: "/chat", label: "AI 对话", icon: MessageSquare },
     { path: "/dashboard", label: "个人仪表盘", icon: LayoutDashboard },
   ];
