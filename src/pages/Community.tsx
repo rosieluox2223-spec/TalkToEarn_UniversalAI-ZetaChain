@@ -386,7 +386,7 @@ const Community = () => {
                   <p className="text-sm text-muted-foreground">总收益</p>
                   <Coins className="h-5 w-5 text-accent" />
                 </div>
-                <p className="text-2xl font-bold">{stats.total_rewards.toFixed(6)} USDT</p>
+                <p className="text-2xl font-bold">{stats.total_rewards.toFixed(6)} ZETA</p>
                 <p className="text-xs text-muted-foreground mt-2">内容创造价值</p>
               </Card>
               
@@ -551,7 +551,7 @@ const Community = () => {
                           <div className="flex items-center gap-1">
                             <Coins className="h-3 w-3 text-yellow-600" />
                             <span className="text-xs font-medium">
-                              {file.total_reward.toFixed(6)} USDT
+                              {file.total_reward.toFixed(6)} ZETA
                             </span>
                           </div>
                         </div>
