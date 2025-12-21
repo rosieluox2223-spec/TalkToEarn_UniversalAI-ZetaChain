@@ -316,7 +316,7 @@ const FileDetail = () => {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">总收益</p>
-                    <p className="text-lg font-bold">{fileInfo.total_reward.toFixed(6)} USDT</p>
+                    <p className="text-lg font-bold">{fileInfo.total_reward.toFixed(6)} ZETA</p>
                   </div>
                 </div>
                 
