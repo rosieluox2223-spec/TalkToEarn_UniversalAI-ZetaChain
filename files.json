@@ -37,5 +37,29 @@
     "file_path": "SHARED_CONTENT\\20251220134820_0x6d94e87fa68cc9b474d3e29141bb11930b5056b1.txt",
     "ipfs_url": "https://gateway.pinata.cloud/ipfs/QmNkx7dDrtPFijbrXwZrpPkdx8ahDK5FidjTqRipJsoi6b",
     "total_staked": 0.003
+  },
+  "20251221120253_0x6d94e87fa68cc9b474d3e29141bb11930b5056b1": {
+    "filename": "work",
+    "user_id": "0x6d94e87fa68cc9b474d3e29141bb11930b5056b1",
+    "content": "工作首先为满足生存所需，换取衣食住行的资源。更深层地，它是实现个人价值、发挥能力的重要途径，让人获得成就感与社会认同。同时，工作也是融入社会、建立连接的方式，通过创造与贡献推动集体进步。因此，工作兼顾了生存、成长与归属三重意义。",
+    "content_preview": "工作首先为满足生存所需，换取衣食住行的资源。更深层地，它是实现个人价值、发挥能力的重要途径，让人获得成就感与社会认同。同时，工作也是融入社会、建立连接的方式，通过创造与贡献推动集体进步。因此，工作兼顾了生存、成长与归属三重意义。",
+    "upload_time": "2025-12-21T12:02:58.236589",
+    "authorize_rag": true,
+    "reference_count": 0,
+    "total_reward": 0.0,
+    "file_path": "SHARED_CONTENT\\20251221120253_0x6d94e87fa68cc9b474d3e29141bb11930b5056b1.txt",
+    "ipfs_url": "https://gateway.pinata.cloud/ipfs/QmUmrLQ9mX8HsBkhEh87Y6T5Y7aLDpqq5oofR2RNMeMted"
+  },
+  "20251221122053_0x6d94e87fa68cc9b474d3e29141bb11930b5056b1": {
+    "filename": "happy",
+    "user_id": "0x6d94e87fa68cc9b474d3e29141bb11930b5056b1",
+    "content": "开心是身心健康的天然良药。它能增强免疫力，缓解压力，降低患病风险；提升思维灵活性与创造力，助力问题解决；促进人际和谐，增强同理心与吸引力。持续的愉悦感还能提升整体生活满意度，形成积极循环——以乐观之心拥抱当下，用笑声点亮生活，是最好的自我滋养。",
+    "content_preview": "开心是身心健康的天然良药。它能增强免疫力，缓解压力，降低患病风险；提升思维灵活性与创造力，助力问题解决；促进人际和谐，增强同理心与吸引力。持续的愉悦感还能提升整体生活满意度，形成积极循环——以乐观之心拥抱当下，用笑声点亮生活，是最好的自我滋养。",
+    "upload_time": "2025-12-21T12:20:57.880035",
+    "authorize_rag": true,
+    "reference_count": 0,
+    "total_reward": 0.0,
+    "file_path": "SHARED_CONTENT\\20251221122053_0x6d94e87fa68cc9b474d3e29141bb11930b5056b1.txt",
+    "ipfs_url": "https://gateway.pinata.cloud/ipfs/QmRMUbFhRKACLNK3GBLDBTgoymATJracwL2rhYHNNCxEga"
   }
 }
