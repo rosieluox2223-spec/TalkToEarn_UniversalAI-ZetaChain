@@ -9,6 +9,21 @@ import { switchToChain } from './chains'
 import { zetaChainCrossChainTransfer } from './zetachain'
 
 /**
+ * 将科学计数法字符串转换为普通数字字符串
+ * @param numStr 科学计数法字符串 (如 "1e-06")
+ * @returns 普通数字字符串 (如 "0.000001")
+ */
+function convertScientificToDecimal(numStr: string): string {
+  const num = Number(numStr);
+  if (isNaN(num)) {
+    throw new Error(`无效的数字字符串: ${numStr}`);
+  }
+  
+  // 将数字转换为普通字符串表示
+  return num.toFixed(18).replace(/\.?0+$/, '');
+}
+
+/**
  * 执行链上操作
  */
 export async function executeIntent(
@@ -66,8 +81,9 @@ async function handleZetaTransfer(
     throw new Error(`接收地址格式不正确: ${recipientAddress}`)
   }
 
-  // 转换金额
-  const amount = ethers.parseEther(intent.amount)
+  // 转换金额 (处理科学计数法)
+  const decimalAmount = convertScientificToDecimal(intent.amount);
+  const amount = ethers.parseEther(decimalAmount)
 
   // 检查余额
   const balance = await newProvider.getBalance(userAddress)

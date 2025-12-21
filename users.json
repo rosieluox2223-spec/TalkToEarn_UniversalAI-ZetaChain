@@ -49,6 +49,110 @@
         "timestamp": "2025-12-20T23:19:22.280860",
         "similarity": 0.38633780981135385,
         "weight": 1.0
+      },
+      {
+        "file_id": "20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+        "question": "为什么人类需要爱？",
+        "reward": 1e-06,
+        "timestamp": "2025-12-21T09:12:08.809766",
+        "similarity": 0.24316168729671564,
+        "weight": 1.0
+      },
+      {
+        "file_id": "20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+        "question": "为什么人类需要爱？",
+        "reward": 1e-06,
+        "timestamp": "2025-12-21T09:41:55.046917",
+        "similarity": 0.24316168729671564,
+        "weight": 1.0
+      },
+      {
+        "file_id": "20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+        "question": "为什么人类需要爱？",
+        "reward": 1e-06,
+        "timestamp": "2025-12-21T09:50:32.636065",
+        "similarity": 0.24316168729671564,
+        "weight": 1.0
+      },
+      {
+        "file_id": "20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+        "question": "为什么人类需要爱？",
+        "reward": 1e-06,
+        "timestamp": "2025-12-21T09:55:55.211965",
+        "similarity": 0.24316168729671564,
+        "weight": 1.0
+      },
+      {
+        "file_id": "20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+        "question": "为什么人类需要爱？",
+        "reward": 1e-06,
+        "timestamp": "2025-12-21T10:16:58.910363",
+        "similarity": 0.24316168729671564,
+        "weight": 1.0
+      },
+      {
+        "file_id": "20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+        "question": "为什么人类需要爱？",
+        "reward": 1e-06,
+        "timestamp": "2025-12-21T10:17:42.305861",
+        "similarity": 0.24316168729671564,
+        "weight": 1.0
+      },
+      {
+        "file_id": "20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+        "question": "为什么人类需要爱?",
+        "reward": 1e-06,
+        "timestamp": "2025-12-21T10:21:24.704034",
+        "similarity": 0.4330334333705467,
+        "weight": 1.0
+      },
+      {
+        "file_id": "20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+        "question": "为什么人类需要爱？",
+        "reward": 1e-06,
+        "timestamp": "2025-12-21T10:24:30.544551",
+        "similarity": 0.24316168729671564,
+        "weight": 1.0
+      },
+      {
+        "file_id": "20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+        "question": "为什么人类需要爱？",
+        "reward": 1e-06,
+        "timestamp": "2025-12-21T10:29:13.413959",
+        "similarity": 0.24316168729671564,
+        "weight": 1.0
+      },
+      {
+        "file_id": "20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+        "question": "为什么人类需要爱？",
+        "reward": 1e-06,
+        "timestamp": "2025-12-21T10:37:50.059402",
+        "similarity": 0.24316168729671564,
+        "weight": 1.0
+      },
+      {
+        "file_id": "20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+        "question": "为什么人类需要爱？",
+        "reward": 1e-06,
+        "timestamp": "2025-12-21T10:41:12.636672",
+        "similarity": 0.24316168729671564,
+        "weight": 1.0
+      },
+      {
+        "file_id": "20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+        "question": "为什么人类需要爱？",
+        "reward": 1e-06,
+        "timestamp": "2025-12-21T10:41:58.013614",
+        "similarity": 0.24316168729671564,
+        "weight": 1.0
+      },
+      {
+        "file_id": "20251220024142_0x2e5f15e329b49d4b38ffdd100e0793780966ea6d",
+        "question": "为什么人类需要爱？",
+        "reward": 1e-06,
+        "timestamp": "2025-12-21T11:13:52.246972",
+        "similarity": 0.24316168729671564,
+        "weight": 1.0
       }
     ]
   },
@@ -75,8 +179,8 @@
   "0xeb2eb574be8001ef7ff3c60bd56caac4ed58fab2": {
     "password_hash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
     "coin_balance": 1.0,
-    "total_earned": 0.0,
-    "total_spent": 0.0,
+    "total_earned": 23.0,
+    "total_spent": 22.0,
     "registration_time": "2025-12-20T13:45:38.984831",
     "uploaded_files": [],
     "referenced_files": []

@@ -63,9 +63,10 @@ const Chat = () => {
   
   // 添加系统消息的函数
   const addSystemMessage = (message: Omit<SystemMessage, 'id' | 'timestamp'>): SystemMessage => {
+    // 使用 Date.now() 和随机数组合生成唯一 ID
     const newSystemMessage: SystemMessage = {
       ...message,
-      id: 'sysmsg-' + Date.now(),
+      id: 'sysmsg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
       timestamp: new Date(),
     };
     setSystemMessages((prev) => [...prev, newSystemMessage]);
@@ -161,6 +162,14 @@ const Chat = () => {
         content: '钱包未连接',
       });
       setPendingIntent(null);
+      // 通知后端转账失败
+      if (socket) {
+        socket.emit('user_transaction_confirmation', {
+          user_id: account,
+          confirmed: false,
+          tx_hash: null
+        });
+      }
       return;
     }
 
@@ -196,6 +205,16 @@ const Chat = () => {
         content: successContent,
       });
       
+      // 通知后端转账成功
+      if (socket) {
+        socket.emit('user_transaction_confirmation', {
+          user_id: account,
+          confirmed: true,
+          tx_hash: txHash,
+          transaction_id: null  // 如果有transaction_id，可以在这里添加
+        });
+      }
+      
       // 3秒后关闭弹窗
       setTimeout(() => {
         setIsExecuting(false);
@@ -210,6 +229,15 @@ const Chat = () => {
         type: 'error',
         content: `转账失败: ${error.message || '未知错误'}`,
       });
+      
+      // 通知后端转账失败
+      if (socket) {
+        socket.emit('user_transaction_confirmation', {
+          user_id: account,
+          confirmed: false,
+          tx_hash: null
+        });
+      }
     } finally {
       setIsExecuting(false);
     }
@@ -224,6 +252,15 @@ const Chat = () => {
       type: 'info',
       content: '转账请求已取消',
     });
+    
+    // 通知后端转账已取消
+    if (socket) {
+      socket.emit('user_transaction_confirmation', {
+        user_id: account,
+        confirmed: false,
+        tx_hash: null
+      });
+    }
   };
   
   // 系统消息自动滚动

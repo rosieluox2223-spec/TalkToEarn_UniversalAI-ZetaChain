@@ -8,7 +8,22 @@
 
 import { ethers } from 'ethers'
 import { switchToChain } from './chains'
-import { Intent } from '../types/intent' // 确保路径根据你的项目结构正确引用
+import { Intent } from '../typs/intent' // 修复路径错误
+
+/**
+ * 将科学计数法字符串转换为普通数字字符串
+ * @param numStr 科学计数法字符串 (如 "1e-06")
+ * @returns 普通数字字符串 (如 "0.000001")
+ */
+function convertScientificToDecimal(numStr: string): string {
+  const num = Number(numStr);
+  if (isNaN(num)) {
+    throw new Error(`无效的数字字符串: ${numStr}`);
+  }
+  
+  // 将数字转换为普通字符串表示
+  return num.toFixed(18).replace(/\.?0+$/, '');
+}
 
 // ==========================================
 // 1. 合约地址配置 (你刚刚部署的合约)
@@ -129,7 +144,9 @@ export async function zetaChainCrossChainTransfer(
     throw new Error(`接收地址格式不正确: ${recipientAddress}`)
   }
 
-  const amount = ethers.parseEther(intent.amount)
+  // 转换金额 (处理科学计数法)
+  const decimalAmount = convertScientificToDecimal(intent.amount);
+  const amount = ethers.parseEther(decimalAmount)
 
   if (amount < MIN_CROSS_CHAIN_AMOUNT) {
     throw new Error(`跨链金额太小，最小要求: 0.23 ZETA`)

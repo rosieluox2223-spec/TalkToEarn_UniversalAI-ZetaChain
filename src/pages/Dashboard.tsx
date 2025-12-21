@@ -379,7 +379,7 @@ const Dashboard = () => {
                       
                       {stat.label === "总收益" && data && (
                         <p className="text-xs text-muted-foreground mt-2">
-                          余额: {data.user_info.coin_balance.toFixed(6)} USDT
+                          余额: {data.user_info.coin_balance.toFixed(6)} ZETA
                         </p>
                       )}
                     </Card>
@@ -462,7 +462,7 @@ const Dashboard = () => {
                           
                           <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                             <span className="bg-muted px-2 py-0.5 rounded">
-                              收益: {item.total_reward.toFixed(6)} USDT
+                              收益: {item.total_reward.toFixed(6)} ZETA
                             </span>
                             
                             {item.ipfs_url && item.ipfs_url !== "None" && item.ipfs_url !== "null" && (
@@ -508,12 +508,12 @@ const Dashboard = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">总支出:</span>
-                      <span>{data.user_info.total_spent.toFixed(6)} USDT</span>
+                      <span>{data.user_info.total_spent.toFixed(6)} ZETA</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">净收益:</span>
                       <span className="text-green-500">
-                        {(data.user_info.total_earned - data.user_info.total_spent).toFixed(6)} USDT
+                        {(data.user_info.total_earned - data.user_info.total_spent).toFixed(6)} ZETA
                       </span>
                     </div>
                   </div>
@@ -526,7 +526,7 @@ const Dashboard = () => {
                       <span className="text-muted-foreground">今日收益:</span>
                       <span className="text-green-500">
                         {data.stats.monthly_growth.raw_value > 0 ? '+' : ''}
-                        {data.stats.monthly_growth.raw_value.toFixed(6)} USDT
+                        {data.stats.monthly_growth.raw_value.toFixed(6)} ZETA
                       </span>
                     </div>
                     <div className="flex justify-between">

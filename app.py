@@ -1070,22 +1070,30 @@ def distribute_rewards(user_id, question, relevant_docs, total_cost):
                         
                         send_system_message('success', f"成功分配奖励: {file_owner} (钱包: {wallet_account}) 获得 {reward_amount:.8f} coin")
                         
-                        # 发送转账意图到前端
+                        # 生成转账意图
+                        transfer_intent = None
                         if wallet_account and wallet_account != '未绑定钱包' and wallet_account != '':
-                            print(f"🚀 发送转账意图到前端，钱包地址: {wallet_account}")
+                            print(f"🚀 生成转账意图，钱包地址: {wallet_account}")
                             transfer_intent = {
                                 "action": "transfer",
                                 "fromChain": "zetachain",
                                 "toChain": "zetachain",
                                 "fromToken": "ZETA",
                                 "toToken": "ZETA",
-                                "amount": "0.01",
+                                "amount": f"{reward_amount:.8f}",    
                                 "recipient": wallet_account
                             }
-                            socketio.emit('system_message', {'type': 'intent', 'data': transfer_intent}, namespace='/ws')
-                            print(f"✅ 转账意图发送成功")
+                            print(f"✅ 转账意图生成成功")
                         else:
-                            print(f"❌ 不发送转账意图: 钱包地址无效 -> {wallet_account}")
+                            print(f"❌ 不生成转账意图: 钱包地址无效 -> {wallet_account}")
+                        
+                        # 将转账意图添加到distribution_info中
+                        distribution_info[file_id] = {
+                            'reward': reward_amount,
+                            'weight': reward_info['weight'],
+                            'similarity': reward_info['similarity'],
+                            'transfer_intent': transfer_intent
+                        }
                     except Exception as e:
                         print(f"❌ 奖励分配失败 {file_id}: {e}")
             else:
@@ -1836,7 +1844,6 @@ def ask_stream():
         
         try:
             conversation_cost = 0.000001
-            record_transaction('spend', user_id, 'system', conversation_cost, None, None, question)
             
             # 从数据库获取最新余额
             conn = get_db_connection()
@@ -1845,7 +1852,12 @@ def ask_stream():
             
             if user:
                 current_balance = user['coin_balance']
-                print(f"💰 本次对话消耗 {conversation_cost:.6f} coin，当前余额: {current_balance:.6f} coin")
+                print(f"💰 本次对话预计消耗 {conversation_cost:.6f} coin，当前余额: {current_balance:.6f} coin")
+                # 先检查余额是否足够，但不立即扣除
+                if current_balance < conversation_cost:
+                    yield "data: Coin余额不足，请充值\n\n"
+                    yield "data: [END]\n\n"
+                    return
             
             if not vector_store or vector_store._collection.count() == 0:
                 print("知识库为空，直接基于模型知识回答...")
@@ -1905,15 +1917,19 @@ def ask_stream():
                 print(f"智能决策出错: {str(e)}，默认使用RAG")
                 should_use_rag, rag_reason, confidence = True, "默认使用RAG", 0.5
             
-            # 奖励分配信息只在后端显示
+            # 当需要引用文档时，先发送转账意图给前端并等待用户确认
             if relevant_docs and should_use_rag:
                 try:
+                    # 进行奖励分配（使用1074行的转账逻辑）
                     print(f"开始奖励分配: 用户 {user_id}, 问题 '{question}', 相关文档 {len(relevant_docs)} 个")
                     reward_distribution = distribute_rewards(user_id, question, relevant_docs, conversation_cost)
                     
                     if reward_distribution:
                         print("奖励分配详情：")
                         total_distributed = 0
+                        
+                        # 收集所有需要发送的转账意图
+                        transfer_intents = []
                         
                         for file_id, reward_info in reward_distribution.items():
                             files = load_files()
@@ -1924,47 +1940,82 @@ def ask_stream():
                             reward_amount = reward_info['reward']
                             weight = reward_info['weight']
                             similarity = reward_info['similarity']
+                            transfer_intent = reward_info.get('transfer_intent')
                             
                             total_distributed += reward_amount
                             
                             print(f"📄 {filename} (用户: {file_owner})")
-                            print(f"    相似度: {similarity:.3f} | 权重: {weight:.3f} | 奖励: {reward_amount:.8f} coin")
+                            print(f"    相似度: {similarity:.3f} | 权重: {weight:.3f} | 奖励: {reward_amount:.8f} ZETA")
+                            
+                            # 收集有效的转账意图
+                            if transfer_intent:
+                                transfer_intents.append(transfer_intent)
                         
                         print(f"💰 总分配金额: {total_distributed:.8f} coin")
+                        print(f"📤 需要发送 {len(transfer_intents)} 个转账意图")
+                        
+                        # 发送所有转账意图到前端
+                        if transfer_intents:
+                            yield "data: 📤 正在处理奖励分配...\n\n"
+                            
+                            # 发送每个转账意图
+                            for intent in transfer_intents:
+                                socketio.emit('system_message', {
+                                    'type': 'intent',
+                                    'data': intent
+                                }, namespace='/ws')
+                                print(f"✅ 发送转账意图: {intent['amount']} {intent['fromToken']} 到 {intent['recipient']}")
+                            
+                            # 等待用户确认所有转账
+                            yield "data: 📤 请确认所有转账...\n\n"
+                            
+                            # 等待用户确认转账
+                            confirmed, tx_id, tx_hash = wait_for_transaction_confirmation(user_id, timeout=120)
+                            
+                            if confirmed:
+                                # 只有在用户确认转账后才扣除费用
+                                record_transaction('spend', user_id, 'system', conversation_cost, None, None, question)
+                                yield "data: ✅ 所有转账已成功确认\n\n"
+                            else:
+                                # 用户放弃转账或超时
+                                yield "data: ❌ 转账失败或取消\n\n"
+                                yield "data: [END]\n\n"
+                                return
                     else:
                         print("⚠️ 没有进行奖励分配")
-                        
+                    
                 except Exception as e:
                     print(f"❌ 奖励分配出错: {e}")
+                    yield f"data: 奖励分配出错: {str(e)}\n\n"
             
-            # 🎯 修复：优化AI回答生成部分
-            if should_use_rag and relevant_docs:
+            # 🎯 修复：优化AI回答生成部分 - 直接执行回答生成逻辑
+            if relevant_docs and should_use_rag:
                 try:
                     strategy, hybrid_prompt = hybrid_answering_strategy(question, relevant_docs, confidence)
                     print(f"使用回答策略: {strategy}")
 
                     unique_sources = {}
                     for doc in relevant_docs:
-                        src = doc.metadata.get("source", "未知文件")
-                        filename = os.path.basename(src)
-                        # 🎯 修改：去掉文件扩展名，只显示文件名
-                        filename_without_ext = os.path.splitext(filename)[0]
-                        page = doc.metadata.get("page")
-                        ipfs_url = doc.metadata.get("ipfs_url")
-                        similarity = doc.metadata.get('semantic_similarity', 0)
-                        
-                        if filename not in unique_sources:
-                            display_name = f"《{filename_without_ext}》"
-                            display_name += f"ipfs_url:{ipfs_url}"
-                            if page is not None:
-                                display_name += f" (第 {page + 1} 页)"
-                            display_name += f" [相关度:{similarity:.2f}]"
+                            src = doc.metadata.get("source", "未知文件")
+                            filename = os.path.basename(src)
+                            # 🎯 修改：去掉文件扩展名，只显示文件名
+                            filename_without_ext = os.path.splitext(filename)[0]
+                            page = doc.metadata.get("page")
+                            ipfs_url = doc.metadata.get("ipfs_url")
+                            similarity = doc.metadata.get('semantic_similarity', 0)
                             
-                            unique_sources[filename] = {
-                                'display': display_name,
-                                'similarity': similarity
-                            }
-                    
+                            if filename not in unique_sources:
+                                display_name = f"《{filename_without_ext}》"
+                                display_name += f"ipfs_url:{ipfs_url}"
+                                if page is not None:
+                                    display_name += f" (第 {page + 1} 页)"
+                                display_name += f" [相关度:{similarity:.2f}]"
+                                
+                                unique_sources[filename] = {
+                                    'display': display_name,
+                                    'similarity': similarity
+                                }
+                        
                     # 发送相关文档信息到前端
                     if unique_sources:
                         yield "data: 📚 本次回答参考了以下文档：\n\n"
@@ -2022,19 +2073,17 @@ def ask_stream():
                             yield f"data: 简化回答: {simple_text}\n\n"
                         except:
                             yield "data: 无法生成回答，请重试\n\n"
-                    
                 except Exception as e:
                     print(f"回答策略出错: {e}")
                     yield f"data: 回答策略出错: {str(e)}\n\n"
 
-# ==================== 在 app.py 的 ask_stream 函数中找到模型自身知识回答部分 ====================
-
-# 替换这个 else 分支（模型自身知识回答部分）
-            # ==================== 替代方案：合并回答和提示信息 ====================
-
+            # ==================== 基于模型自身知识回答部分 ====================
             else:
                 print("将基于模型自身知识进行回答...")
                 try:
+                    # 扣除费用
+                    record_transaction('spend', user_id, 'system', conversation_cost, None, None, question)
+                    
                     enhanced_prompt = f"请回答以下问题：{question}"
                     
                     response = llm.invoke(enhanced_prompt)
@@ -2639,6 +2688,66 @@ def handle_connect():
     emit('system_message', {'type': 'info', 'content': '后端WebSocket连接成功'})
 
 
+# 存储用户的转账确认状态
+user_transaction_confirmations = {}
+
+
+def wait_for_transaction_confirmation(user_id, timeout=120):
+    """等待用户的转账确认
+    
+    Args:
+        user_id: 用户ID
+        timeout: 超时时间（秒）
+        
+    Returns:
+        tuple: (是否确认, 交易ID, 交易哈希)
+    """
+    start_time = time.time()
+    
+    # 先清除之前的确认状态
+    if user_id in user_transaction_confirmations:
+        del user_transaction_confirmations[user_id]
+    
+    while time.time() - start_time < timeout:
+        # 检查用户的确认状态
+        if user_id in user_transaction_confirmations:
+            confirmation = user_transaction_confirmations[user_id]
+            # 清除已处理的确认状态
+            del user_transaction_confirmations[user_id]
+            return confirmation['confirmed'], confirmation['transaction_id'], confirmation['tx_hash']
+        
+        # 等待一小段时间
+        time.sleep(0.5)
+    
+    # 超时
+    return False, None, None
+
+@socketio.on('user_transaction_confirmation', namespace='/ws')
+def handle_user_transaction_confirmation(data):
+    """处理用户的转账确认"""
+    user_id = data.get('user_id')
+    confirmed = data.get('confirmed')
+    transaction_id = data.get('transaction_id')
+    tx_hash = data.get('tx_hash')
+    
+    print(f"收到用户转账确认: 用户 {user_id}, 确认状态 {confirmed}, 交易ID {transaction_id}, 交易哈希 {tx_hash}")
+    
+    # 存储用户的确认状态
+    if user_id:
+        user_transaction_confirmations[user_id] = {
+            'confirmed': confirmed,
+            'transaction_id': transaction_id,
+            'tx_hash': tx_hash,
+            'timestamp': datetime.now().isoformat()
+        }
+    
+    # 发送确认消息给客户端
+    emit('system_message', {
+        'type': 'success' if confirmed else 'info',
+        'content': f'转账已{"确认" if confirmed else "取消"}'
+    }, namespace='/ws')
+
+
 @app.route('/api/test_system_message', methods=['GET'])
 def test_system_message():
     """测试接口：发送系统消息"""
@@ -2817,16 +2926,16 @@ def get_dashboard_data():
         
         if tx['type'] == 'reward' and tx['to_user'] == user_id:
             activity_type = "收益"
-            content = f"AI 模型调用收益 +{tx['amount']:.6f} USDT"
+            content = f"AI 模型调用收益 +{tx['amount']:.6f} ZETA"
         elif tx['type'] == 'spend' and tx['from_user'] == user_id:
             activity_type = "支出"
-            content = f"AI 提问支出 -{tx['amount']:.6f} USDT"
+            content = f"AI 提问支出 -{tx['amount']:.6f} ZETA"
         elif tx['type'] == 'reference' and tx.get('file_owner') == user_id:
             activity_type = "引用"
             content = f"您的内容被 AI 引用"
         elif tx['type'] == 'reward' and tx.get('file_owner') == user_id:
             activity_type = "收益"
-            content = f"数据授权收益 +{tx['amount']:.6f} USDT"
+            content = f"数据授权收益 +{tx['amount']:.6f} ZETA"
         
         if activity_type:
             # 计算相对时间
@@ -2881,7 +2990,7 @@ def get_dashboard_data():
             'stats': {
                 'total_earned': {
                     'label': '总收益',
-                    'value': f"{total_earned:.6f} USDT",
+                    'value': f"{total_earned:.6f} ZETA",
                     'raw_value': total_earned
                 },
                 'data_nft': {
@@ -2896,7 +3005,7 @@ def get_dashboard_data():
                 },
                 'monthly_growth': {
                     'label': '本月增长',
-                    'value': f"+{monthly_growth:.6f} USDT" if monthly_growth > 0 else f"{monthly_growth:.6f} USDT",
+                    'value': f"+{monthly_growth:.6f} ZETA" if monthly_growth > 0 else f"{monthly_growth:.6f} ZETA",
                     'raw_value': monthly_growth
                 }
             },
